@@ -1,5 +1,7 @@
 # DeepCost
 
+> **中文** | [English](README.en.md)
+
 > 2026年8月17日 by 运维部Harmen（原作者）
 > 仓库：https://github.com/whjdygyh/DeepCost
 > 版本：v1.1.0

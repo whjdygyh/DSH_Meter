@@ -1,5 +1,7 @@
 # DeepCost
 
+> **English** | [中文](README.md)
+
 > 2026-08-17 by Harmen (Ops)
 > Repository: https://github.com/whjdygyh/DeepCost
 > Version: v1.1.0
