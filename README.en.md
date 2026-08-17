@@ -46,6 +46,10 @@ The readout looks like:
 - **Gemini sessions**: show the month-to-date cumulative output tokens, reset on the 1st; other cells hide as appropriate.
 - **Other providers**: generic info only (peak/valley, token usage) — nothing breaks.
 
+### i18n
+
+The readout **follows the DSH UI language automatically**: English UI shows `Peak / Valley · Out 4.5K · Balance ¥95.29 · Rec v4-flash`, Chinese UI shows Chinese. The recommendation task and reason are also generated in the UI language. Currently supported: **Chinese (zh-CN) and English (en-US)**.
+
 ### Planned Models
 
 - **More DeepSeek models**: tracked as official releases ship (e.g. new v4 series), automatically adapting peak/valley pricing and recommendation.
