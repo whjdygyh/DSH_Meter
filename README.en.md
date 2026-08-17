@@ -89,4 +89,4 @@ The project is already laid out as a DSH plugin package, ready to publish to npm
 
 ## License
 
-[MIT](./LICENSE) © 2026 苏明阳 (Andy)
+[MIT](./LICENSE) © 2026 whjdygyh

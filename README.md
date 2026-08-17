@@ -85,4 +85,4 @@ DSH `0.1.0-rc.6` 的第三方插件「打包 + 发布」工具链尚未随 npm �
 
 ## License
 
-[MIT](./LICENSE) © 2026 苏明阳 (Andy)
+[MIT](./LICENSE) © 2026 whjdygyh
