@@ -3,15 +3,16 @@
 > **English** | [中文](README.md)
 
 > 2026-08-17 by Harmen (Ops)
+> Updated: 2026-08-18 (v1.2.0: i18n support, Gemini readout narrowed to usage)
 > Repository: https://github.com/whjdygyh/DeepCost
-> Version: v1.1.0
+> Version: v1.2.0
 
 **DeepCost** shows a compact readout in the **DeepSeek Harness (DSH)** session header:
 
-- **Peak / valley pricing** (Beijing time 9:00-12:00 & 14:00-18:00 = peak, otherwise valley)
+- **Peak / valley pricing** (Beijing time 9:00-12:00 & 14:00-18:00 = peak, otherwise valley; DeepSeek sessions only)
 - **Output token usage** (cumulative `outputTokens` of the current session, pushed live)
 - **DeepSeek account balance** (¥, refreshed every 60 seconds; the balance itself is the recharge link)
-- **Task-based model recommendation** (distills the recent conversation and recommends flash / pro with one-click switching)
+- **Task-based model recommendation** (distills the recent conversation and recommends flash / pro with one-click switching; DeepSeek sessions only)
 - **Gemini monthly usage** (cumulative output tokens of the natural month, reset on the 1st)
 
 ![screenshot](docs/screenshot.png)
@@ -45,12 +46,12 @@ The readout looks like:
 | Google Gemini | `gemini-2.5-flash` and other Gemini models | Monthly usage (cumulative output tokens of the natural month) |
 
 - **DeepSeek sessions**: full feature set (peak/valley pricing, token usage, balance, task-based recommendation, one-click switch).
-- **Gemini sessions**: show the month-to-date cumulative output tokens, reset on the 1st; other cells hide as appropriate.
-- **Other providers**: generic info only (peak/valley, token usage) — nothing breaks.
+- **Gemini sessions**: only the month-to-date cumulative output tokens (reset on the 1st); peak/valley and recommendation are DeepSeek-only and hidden here.
+- **Other providers**: generic info only (token usage) — nothing breaks.
 
 ### i18n
 
-The readout **follows the DSH UI language automatically**: English UI shows `Peak / Valley · Out 4.5K · Balance ¥95.29 · Rec v4-flash`, Chinese UI shows Chinese. The recommendation task and reason are also generated in the UI language. Currently supported: **Chinese (zh-CN) and English (en-US)**.
+The readout **follows the DSH UI language automatically**: English UI shows `Valley · Out 4.5K · Balance ¥95.29 · Rec v4-flash`, Chinese UI shows Chinese. The recommendation task and reason are also generated in the UI language. Currently supported: **Chinese (zh) and English (en)**.
 
 ### Planned Models
 
@@ -133,6 +134,7 @@ Both source files are **plain JavaScript, no imports, no build step**.
 
 ## Changelog
 
+- **v1.2.0**: i18n support (readout follows the DSH UI language); fixed locale codes and the recommendation gating issue; Gemini sessions narrowed to usage only.
 - **v1.1.0**: added peak/valley pricing, task-based model recommendation with one-click switching, Gemini monthly usage; fixed the missing `typertRemote` binding that silently broke remote calls and hid the balance in the formal plugin.
 - **v1.0.0**: initial release — output token usage, account balance, recharge link.
 
