@@ -35,6 +35,30 @@
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（`@deepseek-ai/dsh`，已验证 `0.1.0-rc.6`）
 - 已配置 DeepSeek API key（见下文）
 
+## 支持的模型
+
+| Provider | 模型 | 信息条显示 |
+|---|---|---|
+| DeepSeek | `deepseek-v4-flash` / `deepseek-v4-pro` | 峰/谷、出、余额、推荐、一键切换 |
+| Google Gemini | `gemini-2.5-flash` 等 Gemini 系列 | 本月用量（自然月累计输出 token） |
+
+- DeepSeek 会话：完整功能（峰谷计价、token 用量、余额、任务级推荐、一键切换）。
+- Gemini 会话：显示本月累计输出 token，每月 1 日归零；其余单元按需隐藏。
+- 其他 provider 的会话：仅显示通用信息（峰/谷、token 用量），不影响使用。
+
+### 规划中的模型
+
+- **DeepSeek 更多型号**：随官方发布跟进新版本（如新的 v4 系列型号），自动适配峰谷计价与推荐。
+- **OpenAI / Claude 等主流 provider**：计划加入与 Gemini 类似的月度用量统计（按各自 API 用量口径）。
+- 插件的 provider 识别是通用的，新增 provider 只需在 Host 端补充对应的用量/余额取数逻辑即可，无需改 UI。
+
+## 算力成本说明
+
+信息条本身的**基础功能不产生任何额外算力成本**：
+
+- **token 用量、峰/谷、余额、Gemini 月度**：全部来自 DSH 本地数据或 DeepSeek 官方免费余额接口，不消耗模型算力。
+- **模型推荐**（唯一会调用模型的环节）：每次会话出现新消息后，调用一次 `deepseek-v4-flash` 提炼最近 6 条对话并给出推荐。单次消耗约几百 token（输入约 1K、输出约 100 token 以内），按 v4-flash 计费约为**每次 0.001 元量级**，且只有 DeepSeek 会话触发，可放心使用。无明确任务时仅显示「—」，不产生额外调用。
+
 ## 配置 API Key（复用官方入口）
 
 本插件**不存储密钥**，直接复用 DSH 官方的 DeepSeek 凭据，零额外配置：

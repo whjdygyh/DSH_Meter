@@ -35,6 +35,30 @@ The readout looks like:
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`@deepseek-ai/dsh`, verified on `0.1.0-rc.6`)
 - A configured DeepSeek API key (see below)
 
+## Supported Models
+
+| Provider | Models | Readout |
+|---|---|---|
+| DeepSeek | `deepseek-v4-flash` / `deepseek-v4-pro` | Peak/valley, output tokens, balance, recommendation, one-click switch |
+| Google Gemini | `gemini-2.5-flash` and other Gemini models | Monthly usage (cumulative output tokens of the natural month) |
+
+- **DeepSeek sessions**: full feature set (peak/valley pricing, token usage, balance, task-based recommendation, one-click switch).
+- **Gemini sessions**: show the month-to-date cumulative output tokens, reset on the 1st; other cells hide as appropriate.
+- **Other providers**: generic info only (peak/valley, token usage) — nothing breaks.
+
+### Planned Models
+
+- **More DeepSeek models**: tracked as official releases ship (e.g. new v4 series), automatically adapting peak/valley pricing and recommendation.
+- **OpenAI / Claude and other mainstream providers**: monthly usage statistics similar to Gemini are planned (per each provider's API usage semantics).
+- Provider detection is generic: adding a provider only needs Host-side logic for its usage/balance data — no UI changes.
+
+## Cost Considerations
+
+The **base features of the readout cost nothing extra**:
+
+- **Token usage, peak/valley, balance, Gemini monthly**: all come from local DSH data or the free DeepSeek balance API — no model compute is consumed.
+- **Model recommendation** (the only place a model is called): once per new message in a session, a `deepseek-v4-flash` call distills the latest 6 messages and suggests a model. Each call consumes roughly a few hundred tokens (about 1K input, under 100 output), which costs on the order of **¥0.001 per call** at v4-flash rates — and it only runs in DeepSeek sessions. With no clear task it shows `—` and makes no call.
+
 ## Configure API Key (reuses the official entry)
 
 DeepCost **never stores your key** — it reuses the official DeepSeek credential, so there is zero extra setup:

@@ -28,3 +28,6 @@ Thumbs.db
 # Coverage / temp
 coverage/
 tmp/
+
+# Internal docs (not for public repo)
+docs/开发报告.md
