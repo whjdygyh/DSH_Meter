@@ -1,4 +1,4 @@
-﻿# dsh-meter
+# dsh-meter
 
 > **English** | [中文](README.md)
 
@@ -15,12 +15,12 @@
 - **Task-based model recommendation** (distills the recent conversation and recommends flash / pro with one-click switching; DeepSeek sessions only)
 - **Gemini monthly usage** (cumulative output tokens of the natural month, reset on the 1st)
 
-![screenshot](docs/screenshot.png)
+![screenshot](docs/screenshot-en.png)
 
 The readout looks like:
 
 ```
-谷 · 出 4.5K · 余额 ¥95.29 · 推荐 v4-flash
+Valley · Out 4.5K · Balance ¥95.29 · Rec v4-flash
 ```
 
 ## Features
@@ -121,7 +121,8 @@ Both source files are **plain JavaScript, no imports, no build step**.
 ├── README.en.md      # English docs
 ├── CHANGELOG.md
 ├── docs
-│   └── screenshot.png
+│   ├── screenshot-zh.png  # Chinese UI screenshot
+│   └── screenshot-en.png  # English UI screenshot
 ├── src               # dynamic-plugin source (no build)
 │   ├── index.js      # Host plugin
 │   └── client.js     # Client plugin

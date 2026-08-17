@@ -1,4 +1,4 @@
-﻿# dsh-meter
+# dsh-meter
 
 > **中文** | [English](README.en.md)
 
@@ -15,7 +15,7 @@
 - **任务级模型推荐**（依据最近对话提炼任务，推荐 flash / pro 并支持一键切换；仅 DeepSeek 会话）
 - **Gemini 本月用量**（自然月累计输出 token，每月 1 日归零；Gemini 会话仅显示此用量）
 
-![截图](docs/screenshot.png)
+![截图](docs/screenshot-zh.png)
 
 信息条形态如下：
 
@@ -121,7 +121,8 @@ DSH `0.1.0-rc.6` 的第三方插件「打包 + 发布」工具链尚未随 npm �
 ├── README.en.md      # English docs
 ├── CHANGELOG.md
 ├── docs
-│   └── screenshot.png
+│   ├── screenshot-zh.png  # 中文界面截图
+│   └── screenshot-en.png  # English UI screenshot
 ├── src               # 动态插件版源码（免构建）
 │   ├── index.js      # Host 插件
 │   └── client.js     # Client 插件
