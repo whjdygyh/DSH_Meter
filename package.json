@@ -1,0 +1,42 @@
+{
+  "name": "deepcost",
+  "version": "1.0.0",
+  "description": "DeepCost — a DeepSeek Harness (DSH) plugin showing DeepSeek output-token usage and account balance in the session header, with a one-click recharge link",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./src/client.js"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "files": [
+    "src/index.js",
+    "src/client.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek",
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "usage",
+    "balance",
+    "token",
+    "deepcost"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "react": "^18.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whjdygyh/DeepCost.git"
+  }
+}
