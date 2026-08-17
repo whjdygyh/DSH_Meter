@@ -2,28 +2,33 @@
 
 > 2026年8月17日 by 运维部Harmen（原作者）
 > 仓库：https://github.com/whjdygyh/DeepCost
+> 版本：v1.1.0
 
 **DeepCost** 在 **DeepSeek Harness（DSH）** 会话标题栏右侧显示一条信息条，实时展示：
 
+- **峰/谷计价**（北京时间 9:00-12:00、14:00-18:00 为高峰，其余为空闲）
 - **输出 token 用量**（本会话累计 output tokens，随每次回复实时推送）
-- **DeepSeek 账户余额**（¥，每 60 秒自动刷新）
-- **「充值」入口**（一键直达 `https://platform.deepseek.com/usage`）
+- **DeepSeek 账户余额**（¥，每 60 秒自动刷新；余额本身即「充值」入口）
+- **任务级模型推荐**（依据最近对话提炼任务，推荐 flash / pro 并支持一键切换）
+- **Gemini 本月用量**（自然月累计输出 token，每月 1 日归零）
 
 ![截图](docs/screenshot.png)
 
 信息条形态如下：
 
 ```
-出 4.5K · 余额 ¥29.54 · 充值
+谷 · 出 4.5K · 余额 ¥95.29 · 推荐 v4-flash
 ```
 
 ## 功能特性
 
 | 数据 | 来源 | 更新方式 |
 |---|---|---|
+| 峰/谷 | DeepSeek 官方定价（高峰价格翻倍，空闲半价） | 每分钟刷新，点击直达官方定价文档 |
 | 输出 token | DSH 宿主 `tokenUsage` 投影（累计 outputTokens） | 每次回复实时推送，无需轮询 |
-| 账户余额 | DeepSeek 官方 `GET /user/balance` | 每 60 秒自动刷新 |
-| 充值链接 | `https://platform.deepseek.com/usage` | 静态 |
+| 账户余额 | DeepSeek 官方 `GET /user/balance` | 每 60 秒自动刷新，点击直达充值页 |
+| 模型推荐 | 最近 6 条历史提炼任务，flash/pro 性价比对比 | 新消息后自动刷新，点击一键切换 |
+| Gemini 月度 | Host 增量折叠本月 Gemini 输出 token | 每 5 分钟刷新，每月 1 日归零 |
 
 ## 环境要求
 
@@ -40,48 +45,66 @@
 
 > 插件还兼容自定义凭据引用名：若你的 `llm-deepseek` 配置里改了 `apiKeyEnv`，插件会自动跟随。
 
-## 快速开始（当前推荐：动态插件）
+## 安装（正式插件）
 
-DSH `0.1.0-rc.6` 的第三方插件「打包 + 发布」工具链尚未随 npm 开放，因此目前最直接的运行方式是 **DSH 动态插件**（免构建，源码即用）：
+DeepCost 已按 DSH 插件包规范构建为正式插件（Host + Client 双端，随 DSH 启动加载，出现在 Settings → Plugins）：
 
-1. 在 DSH 中使用支持动态插件的会话（`cordis` 预设）。
-2. 用 `cordis_define` 定义插件：
-   - `code.host` = [`src/index.js`](./src/index.js) 中 `apply` 的函数体（去掉 `export default`，整体包在 `return { … }` 里）
-   - `code.client` = [`src/client.js`](./src/client.js) 同理
-3. `cordis_run` 激活，在 UI 中批准。
+1. 将 `dist/` 中的包复制到你的 profile 依赖目录：
+
+   ```powershell
+   Copy-Item dist\* "$env:USERPROFILE\.dsh\profiles\node_modules\deepcost\" -Recurse -Force
+   ```
+
+2. 在你的 profile 组合文件中声明插件（`web/cordis.patch.yml`）：
+
+   ```yaml
+   - insert:
+       - id: deepcost
+         name: 'deepcost'
+   ```
+
+3. 重启 DSH，在「设置 → 插件」中确认 deepcost 已加载。
+
+### 备选：动态插件（免构建，源码即用）
+
+DSH `0.1.0-rc.6` 的第三方插件「打包 + 发布」工具链尚未随 npm 开放，也可以直接用 **DSH 动态插件**运行（`cordis` 预设会话）：
+
+1. 用 `cordis_define` 定义插件：`code.host` = [`src/index.js`](./src/index.js) 的 `apply` 函数体（去 `export default`，包在 `return { … }` 里）；`code.client` = [`src/client.js`](./src/client.js) 同理。
+2. `cordis_run` 激活，在 UI 中批准。
 
 两个源文件**均为纯 JavaScript、无 import、无构建**，可直接照搬。
-
-## 正式化（工具链开放后）
-
-项目结构已按 DSH 插件包规范备好，未来可直接发布为 npm 包并 `dsh plugin add`：
-
-- `package.json`：`main` 指向 Host 半（`src/index.js`），`exports["./client"]` 指向 Client 半（`src/client.js`），`dsh.client` 声明 `platform: "web"`。
-- 安装后在你的 profile 的 `cordis.patch.yml` 声明：
-
-```yaml
-- id: deepcost
-  name: 'deepcost'
-```
-
-> 注意：正式插件包形态下，`harness.handle`（动态插件专用）需替换为 Typert `@Remote`，client bundle 需用 DSH 的 `tsdown` 工具链构建为 `__ModuleLoader__.load` 格式。这两点是 DSH 生态内部机制，待其对外发布后即可无缝切换。
 
 ## 技术原理
 
 - **用量**：DSH 宿主持有服务级 `tokenMeter` 与 `tokenUsage` 会话投影；Client 端通过 Slot 标准属性 `useProjection('tokenUsage')` 直接订阅，Host 侧零自定义代码。
-- **余额**：Client 经包私有 RPC 请求 Host；Host 用 `credentials.resolve('DEEPSEEK_API_KEY')` 解析密钥（密钥只在宿主进程内使用、绝不下发浏览器），再以 `curl` 查询官方 `/user/balance`，返回 `balance_infos` 中的 CNY 余额。
-- **沙箱**：余额查询的 `shell.resolve` 显式以 `danger-full-access` 模式执行——DSH 沙箱只约束「文件效果」、不约束网络，全访问模式仅为避免 `workspace-write` 下 `curl` 子进程被 confine 而失败（只读外发，无文件写入）。
+- **余额/推荐/Gemini**：Client 经 Typert Remote（`remote.$mount` + `typertGateway` RPC）调用 Host 服务；Host 提供 5 个方法：`balance` / `sessionModels` / `selectModel` / `geminiUsage` / `recommend`。
+- **凭据**：Host 用 `credentials.resolve('DEEPSEEK_API_KEY')` 解析密钥（密钥只在宿主进程内使用、绝不下发浏览器），再以 `curl` 查询官方接口。
+- **沙箱**：`curl` 查询的 `shell.resolve` 显式以 `danger-full-access` 模式执行——DSH 沙箱只约束「文件效果」、不约束网络，全访问模式仅为避免 `workspace-write` 下 `curl` 子进程被 confine 而失败（只读外发，无文件写入）。
 
 ## 目录结构
 
 ```
 ├── package.json      # DSH 插件包声明（exports + dsh.client）
 ├── LICENSE           # MIT
-├── README.md
-└── src
-    ├── index.js      # Host 插件：余额查询 RPC
-    └── client.js     # Client 插件：信息条 UI
+├── README.md         # 中文文档
+├── README.en.md      # English docs
+├── CHANGELOG.md
+├── docs
+│   └── screenshot.png
+├── src               # 动态插件版源码（免构建）
+│   ├── index.js      # Host 插件
+│   └── client.js     # Client 插件
+└── dist              # 正式插件包（构建产物）
+    ├── package.json
+    └── lib
+        ├── index.js  # Host 插件（TypertRemoteService）
+        └── client.js # Client 插件（__ModuleLoader__.load bundle）
 ```
+
+## 版本历史
+
+- **v1.1.0**：新增峰/谷计价、任务级模型推荐与一键切换、Gemini 本月用量；修复正式插件 Host 服务 `typertRemote` binding 缺失导致余额不显示的问题。
+- **v1.0.0**：首个版本——输出 token 用量、账户余额、充值入口。
 
 ## License
 

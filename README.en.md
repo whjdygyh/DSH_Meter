@@ -2,28 +2,33 @@
 
 > 2026-08-17 by Harmen (Ops)
 > Repository: https://github.com/whjdygyh/DeepCost
+> Version: v1.1.0
 
 **DeepCost** shows a compact readout in the **DeepSeek Harness (DSH)** session header:
 
+- **Peak / valley pricing** (Beijing time 9:00-12:00 & 14:00-18:00 = peak, otherwise valley)
 - **Output token usage** (cumulative `outputTokens` of the current session, pushed live)
-- **DeepSeek account balance** (¥, refreshed every 60 seconds)
-- **Recharge link** (one click to `https://platform.deepseek.com/usage`)
+- **DeepSeek account balance** (¥, refreshed every 60 seconds; the balance itself is the recharge link)
+- **Task-based model recommendation** (distills the recent conversation and recommends flash / pro with one-click switching)
+- **Gemini monthly usage** (cumulative output tokens of the natural month, reset on the 1st)
 
 ![screenshot](docs/screenshot.png)
 
 The readout looks like:
 
 ```
-出 4.5K · 余额 ¥29.54 · 充值
+谷 · 出 4.5K · 余额 ¥95.29 · 推荐 v4-flash
 ```
 
 ## Features
 
 | Data | Source | Update |
 |---|---|---|
+| Peak / valley | DeepSeek official pricing (peak = double, valley = half) | Refreshed every minute; click for the official pricing doc |
 | Output tokens | DSH host `tokenUsage` projection (cumulative `outputTokens`) | Pushed live on every reply, no polling |
-| Account balance | DeepSeek official `GET /user/balance` | Auto-refresh every 60 seconds |
-| Recharge link | `https://platform.deepseek.com/usage` | Static |
+| Account balance | DeepSeek official `GET /user/balance` | Auto-refresh every 60 seconds; click for the recharge page |
+| Model recommendation | Latest 6 messages distilled; flash / pro cost comparison | Auto-refresh after new messages; click to switch |
+| Gemini monthly | Host incremental fold of this month's Gemini output tokens | Every 5 minutes; reset on the 1st of each month |
 
 ## Requirements
 
@@ -40,37 +45,41 @@ DeepCost **never stores your key** — it reuses the official DeepSeek credentia
 
 > DeepCost also follows a custom credential ref: if your `llm-deepseek` config overrides `apiKeyEnv`, the plugin honors it automatically.
 
-## Quick Start (currently recommended: dynamic plugin)
+## Install (formal plugin)
 
-DSH `0.1.0-rc.6` has not yet published the third-party plugin build/publish toolchain, so the most direct way to run today is the **DSH dynamic plugin** (no build, source-as-is):
+DeepCost is built as a formal DSH plugin package (Host + Client halves, loaded at DSH startup, shown in Settings → Plugins):
 
-1. Use a DSH session that supports dynamic plugins (the `cordis` preset).
-2. Define the plugin with `cordis_define`:
-   - `code.host` = the `apply` body of [`src/index.js`](./src/index.js) (drop `export default`, wrap in `return { … }`)
-   - `code.client` = the same for [`src/client.js`](./src/client.js)
-3. Activate with `cordis_run` and approve it in the UI.
+1. Copy the package from `dist/` into your profile's dependencies:
+
+   ```powershell
+   Copy-Item dist\* "$env:USERPROFILE\.dsh\profiles\node_modules\deepcost\" -Recurse -Force
+   ```
+
+2. Declare the plugin in your profile composition (e.g. `web/cordis.patch.yml`):
+
+   ```yaml
+   - insert:
+       - id: deepcost
+         name: 'deepcost'
+   ```
+
+3. Restart DSH and confirm deepcost is loaded under **Settings → Plugins**.
+
+### Alternative: dynamic plugin (no build, source-as-is)
+
+DSH `0.1.0-rc.6` has not yet published the third-party plugin build/publish toolchain, so you can also run it as a **DSH dynamic plugin** (a `cordis` preset session):
+
+1. Define the plugin with `cordis_define`: `code.host` = the `apply` body of [`src/index.js`](./src/index.js) (drop `export default`, wrap in `return { … }`); `code.client` = the same for [`src/client.js`](./src/client.js).
+2. Activate with `cordis_run` and approve it in the UI.
 
 Both source files are **plain JavaScript, no imports, no build step**.
-
-## Formalization (once the toolchain ships)
-
-The project is already laid out as a DSH plugin package, ready to publish to npm and install with `dsh plugin add`:
-
-- `package.json`: `main` points to the Host half (`src/index.js`), `exports["./client"]` to the Client half (`src/client.js`), and `dsh.client` declares `platform: "web"`.
-- After install, declare the row in your profile's `cordis.patch.yml`:
-
-```yaml
-- id: deepcost
-  name: 'deepcost'
-```
-
-> Note: in the formal package form, `harness.handle` (dynamic-plugin only) must be replaced with a Typert `@Remote`, and the client bundle must be built into the `__ModuleLoader__.load` format with DSH's `tsdown` toolchain. Both are DSH-internal mechanisms that will switch over seamlessly once they ship publicly.
 
 ## How It Works
 
 - **Usage**: the DSH host owns the service-level `tokenMeter` and the `tokenUsage` session projection; the client subscribes directly through the standard Slot prop `useProjection('tokenUsage')` — zero custom Host code.
-- **Balance**: the client calls the Host over a package-private RPC; the Host resolves the key with `credentials.resolve('DEEPSEEK_API_KEY')` (used only in the host process, never sent to the browser), then queries the official `/user/balance` with `curl` and returns the CNY balance from `balance_infos`.
-- **Sandbox**: the balance query passes `sandboxPolicy: { mode: 'danger-full-access' }` to `shell.resolve`. DSH's sandbox only constrains file effects, not network; full-access mode merely avoids `curl` being confined under `workspace-write` (read-only outbound, no file writes).
+- **Balance / recommendation / Gemini**: the client calls the Host over Typert Remote (`remote.$mount` + `typertGateway` RPC); the Host exposes 5 methods: `balance` / `sessionModels` / `selectModel` / `geminiUsage` / `recommend`.
+- **Credentials**: the Host resolves the key with `credentials.resolve('DEEPSEEK_API_KEY')` (used only in the host process, never sent to the browser), then queries the official endpoints with `curl`.
+- **Sandbox**: the `curl` queries pass `sandboxPolicy: { mode: 'danger-full-access' }` to `shell.resolve`. DSH's sandbox only constrains file effects, not network; full-access mode merely avoids `curl` being confined under `workspace-write` (read-only outbound, no file writes).
 
 ## Directory Layout
 
@@ -82,10 +91,20 @@ The project is already laid out as a DSH plugin package, ready to publish to npm
 ├── CHANGELOG.md
 ├── docs
 │   └── screenshot.png
-└── src
-    ├── index.js      # Host plugin: balance query RPC
-    └── client.js     # Client plugin: header readout UI
+├── src               # dynamic-plugin source (no build)
+│   ├── index.js      # Host plugin
+│   └── client.js     # Client plugin
+└── dist              # formal plugin package (build output)
+    ├── package.json
+    └── lib
+        ├── index.js  # Host plugin (TypertRemoteService)
+        └── client.js # Client plugin (__ModuleLoader__.load bundle)
 ```
+
+## Changelog
+
+- **v1.1.0**: added peak/valley pricing, task-based model recommendation with one-click switching, Gemini monthly usage; fixed the missing `typertRemote` binding that silently broke remote calls and hid the balance in the formal plugin.
+- **v1.0.0**: initial release — output token usage, account balance, recharge link.
 
 ## License
 
