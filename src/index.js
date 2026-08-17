@@ -1,5 +1,5 @@
-/**
- * DeepCost — Host 插件
+﻿/**
+ * dsh-meter — Host 插件
  *
  * 提供「DeepSeek 账户余额查询」的 Client→Host RPC。密钥只在宿主进程内
  * 解析并使用，绝不下发到浏览器，也不外传。

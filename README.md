@@ -1,13 +1,13 @@
-# DeepCost
+﻿# dsh-meter
 
 > **中文** | [English](README.en.md)
 
 > 2026年8月17日 by 运维部Harmen（原作者）
 > 更新：2026年8月18日（v1.2.0：多语言支持、Gemini 会话显示收敛）
-> 仓库：https://github.com/whjdygyh/DeepCost
+> 仓库：https://github.com/whjdygyh/dsh-meter
 > 版本：v1.2.0
 
-**DeepCost** 在 **DeepSeek Harness（DSH）** 会话标题栏右侧显示一条信息条，实时展示：
+**dsh-meter** 在 **DeepSeek Harness（DSH）** 会话标题栏右侧显示一条信息条，实时展示：
 
 - **峰/谷计价**（北京时间 9:00-12:00、14:00-18:00 为高峰，其余为空闲；仅 DeepSeek 会话）
 - **输出 token 用量**（本会话累计 output tokens，随每次回复实时推送）
@@ -78,23 +78,23 @@
 
 ## 安装（正式插件）
 
-DeepCost 已按 DSH 插件包规范构建为正式插件（Host + Client 双端，随 DSH 启动加载，出现在 Settings → Plugins）：
+dsh-meter 已按 DSH 插件包规范构建为正式插件（Host + Client 双端，随 DSH 启动加载，出现在 Settings → Plugins）：
 
 1. 将 `dist/` 中的包复制到你的 profile 依赖目录：
 
    ```powershell
-   Copy-Item dist\* "$env:USERPROFILE\.dsh\profiles\node_modules\deepcost\" -Recurse -Force
+   Copy-Item dist\* "$env:USERPROFILE\.dsh\profiles\node_modules\dsh-meter\" -Recurse -Force
    ```
 
 2. 在你的 profile 组合文件中声明插件（`web/cordis.patch.yml`）：
 
    ```yaml
    - insert:
-       - id: deepcost
-         name: 'deepcost'
+       - id: dsh-meter
+         name: 'dsh-meter'
    ```
 
-3. 重启 DSH，在「设置 → 插件」中确认 deepcost 已加载。
+3. 重启 DSH，在「设置 → 插件」中确认 dsh-meter 已加载。
 
 ### 备选：动态插件（免构建，源码即用）
 

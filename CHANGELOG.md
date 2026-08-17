@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 语义化版本。
 
@@ -47,6 +47,6 @@
 - Host 端余额查询显式以 `danger-full-access` 沙箱执行，规避 `curl` 子进程被 confine。
 - 提供中英文 README、MIT LICENSE、DSH 插件包结构（`dsh.client` + `exports["./client"]`）。
 
-[1.2.0]: https://github.com/whjdygyh/DeepCost/releases/tag/v1.2.0
-[1.1.0]: https://github.com/whjdygyh/DeepCost/releases/tag/v1.1.0
-[1.0.0]: https://github.com/whjdygyh/DeepCost/releases/tag/v1.0.0
+[1.2.0]: https://github.com/whjdygyh/dsh-meter/releases/tag/v1.2.0
+[1.1.0]: https://github.com/whjdygyh/dsh-meter/releases/tag/v1.1.0
+[1.0.0]: https://github.com/whjdygyh/dsh-meter/releases/tag/v1.0.0

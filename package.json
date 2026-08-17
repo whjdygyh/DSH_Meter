@@ -1,7 +1,7 @@
 {
-  "name": "deepcost",
-  "version": "1.0.0",
-  "description": "DeepCost — a DeepSeek Harness (DSH) plugin showing DeepSeek output-token usage and account balance in the session header, with a one-click recharge link",
+  "name": "dsh-meter",
+  "version": "1.2.0",
+  "description": "dsh-meter — a DeepSeek Harness (DSH) plugin showing token usage, account balance, peak/valley pricing, model recommendation, and monthly usage in the session header (multi-provider)",
   "type": "module",
   "main": "src/index.js",
   "exports": {
@@ -22,13 +22,15 @@
   ],
   "keywords": [
     "deepseek",
+    "gemini",
     "dsh",
     "deepseek-harness",
     "plugin",
     "usage",
     "balance",
     "token",
-    "deepcost"
+    "cost",
+    "dsh-meter"
   ],
   "license": "MIT",
   "peerDependencies": {
@@ -37,6 +39,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/whjdygyh/DeepCost.git"
+    "url": "git+https://github.com/whjdygyh/dsh-meter.git"
   }
 }

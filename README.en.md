@@ -1,13 +1,13 @@
-# DeepCost
+﻿# dsh-meter
 
 > **English** | [中文](README.md)
 
 > 2026-08-17 by Harmen (Ops)
 > Updated: 2026-08-18 (v1.2.0: i18n support, Gemini readout narrowed to usage)
-> Repository: https://github.com/whjdygyh/DeepCost
+> Repository: https://github.com/whjdygyh/dsh-meter
 > Version: v1.2.0
 
-**DeepCost** shows a compact readout in the **DeepSeek Harness (DSH)** session header:
+**dsh-meter** shows a compact readout in the **DeepSeek Harness (DSH)** session header:
 
 - **Peak / valley pricing** (Beijing time 9:00-12:00 & 14:00-18:00 = peak, otherwise valley; DeepSeek sessions only)
 - **Output token usage** (cumulative `outputTokens` of the current session, pushed live)
@@ -68,33 +68,33 @@ The **base features of the readout cost nothing extra**:
 
 ## Configure API Key (reuses the official entry)
 
-DeepCost **never stores your key** — it reuses the official DeepSeek credential, so there is zero extra setup:
+dsh-meter **never stores your key** — it reuses the official DeepSeek credential, so there is zero extra setup:
 
 1. Open the DSH web app: **Settings → Models → DeepSeek**.
 2. Enter your DeepSeek API key (stored as the `DEEPSEEK_API_KEY` credential in `$DSH_HOME/.credentials.yaml`).
-3. DeepCost reads that credential to query the balance. Without it, the balance shows `—` while token usage still works.
+3. dsh-meter reads that credential to query the balance. Without it, the balance shows `—` while token usage still works.
 
-> DeepCost also follows a custom credential ref: if your `llm-deepseek` config overrides `apiKeyEnv`, the plugin honors it automatically.
+> dsh-meter also follows a custom credential ref: if your `llm-deepseek` config overrides `apiKeyEnv`, the plugin honors it automatically.
 
 ## Install (formal plugin)
 
-DeepCost is built as a formal DSH plugin package (Host + Client halves, loaded at DSH startup, shown in Settings → Plugins):
+dsh-meter is built as a formal DSH plugin package (Host + Client halves, loaded at DSH startup, shown in Settings → Plugins):
 
 1. Copy the package from `dist/` into your profile's dependencies:
 
    ```powershell
-   Copy-Item dist\* "$env:USERPROFILE\.dsh\profiles\node_modules\deepcost\" -Recurse -Force
+   Copy-Item dist\* "$env:USERPROFILE\.dsh\profiles\node_modules\dsh-meter\" -Recurse -Force
    ```
 
 2. Declare the plugin in your profile composition (e.g. `web/cordis.patch.yml`):
 
    ```yaml
    - insert:
-       - id: deepcost
-         name: 'deepcost'
+       - id: dsh-meter
+         name: 'dsh-meter'
    ```
 
-3. Restart DSH and confirm deepcost is loaded under **Settings → Plugins**.
+3. Restart DSH and confirm dsh-meter is loaded under **Settings → Plugins**.
 
 ### Alternative: dynamic plugin (no build, source-as-is)
 

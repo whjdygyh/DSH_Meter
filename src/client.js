@@ -1,5 +1,5 @@
-/**
- * DeepCost — Client 插件
+﻿/**
+ * dsh-meter — Client 插件
  *
  * 在会话标题栏右侧（conversation.session.header.utilities）渲染信息条：
  *   - 输出 token（本会话累计 outputTokens，实时推送）
@@ -138,7 +138,7 @@ export default {
 
     slots.inject('conversation.session.header.utilities', () =>
       slots.register(
-        { name: 'conversation.session.header.utilities', id: 'deepcost', order: -100 },
+        { name: 'conversation.session.header.utilities', id: 'dsh-meter', order: -100 },
         (props) => React.createElement(UsageBar, props),
       ),
     )
